@@ -14,9 +14,15 @@ client.connect((HOST, PORT))
 
 def send():
     while True:
-        body = input('')
-        message = f'{nickname}: {body}'
-        client.send(message.encode('ascii'))
+        try:
+            message = input('')
+            #message = f'{nickname}: {body}'
+            client.send(message.encode('ascii'))
+        except:
+            # Close Connection When Error
+            print("An error occured!")
+            client.close()
+            break
 
 def recv():
     while(True):
