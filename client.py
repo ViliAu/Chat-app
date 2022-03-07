@@ -5,33 +5,60 @@ import threading
 HOST = "127.0.0.1"
 PORT = 6666
 
-# Choosing Nickname
-nickname = input("Choose your nickname: ")
+# Client settings
+ENCODING = "utf-8"
 
-# Connecting To Server
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect((HOST, PORT))
+def setup_client():
+    # Choosing Nickname
+    nickname = input("Choose your nickname: ")
 
-def send():
+    # Connecting To Server
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        client.connect((HOST, PORT))
+
+        send_thread = threading.Thread(target=send, args=(client,))
+        send_thread.daemon = True
+        #recv_thread = threading.Thread(target=recv, args=(client, nickname,))
+
+        send_thread.start()
+        #recv_thread.start()
+        recv(client, nickname)
+
+    except:
+        print("Couldn't connect to server!")
+
+def send(client):
     while True:
         try:
             message = input('')
-            #message = f'{nickname}: {body}'
-            client.send(message.encode('ascii'))
+            client.send(message.encode(ENCODING))
+        except KeyboardInterrupt:
+            # Close client with keyboard interrupt
+            print("Closing client")
+            client.close()
+            break
         except:
             # Close Connection When Error
             print("An error occured!")
             client.close()
             break
 
-def recv():
+def recv(client, nickname):
     while(True):
         try:
-            message = client.recv(1024).decode('ascii')
-            if message == 'NICKNAME':
-                client.send(nickname.encode('ascii'))
+            message = client.recv(1024).decode(ENCODING)
+            if message == 'NAME':
+                client.send(nickname.encode(ENCODING))
+            elif message == 'DISCONNECT':
+                break
             else:
                 print(message)
+        except KeyboardInterrupt:
+            # Close client with keyboard interrupt
+            print("Closing client")
+            client.close()
+            break
         except:
             # Close Connection When Error
             print("An error occured!")
@@ -39,10 +66,4 @@ def recv():
             break
 
 if __name__ == "__main__":
-    # Setup lient here and pass it to threads
-
-    send_thread = threading.Thread(target=send)
-    recv_thread = threading.Thread(target=recv)
-
-    send_thread.start()
-    recv_thread.start()
+    setup_client()
