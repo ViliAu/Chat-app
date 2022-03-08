@@ -10,9 +10,6 @@ class Client:
         self.name = name
         self.channel = channel
 
-        # Used to check if the client is connected
-        self.connected = True
-
     def change_channel(self, channel_name):
         pass
 
@@ -25,12 +22,14 @@ class Client:
         thread.start()
 
     def disconnect(self):
-        server_channels.channels[self.channel].remove(self)
-        server_messaging.message_client(self.client, "DISCONNECT")
-        self.client.close()
-        print(f"{self.name} left!")
-        server_messaging.broadcast(server_channels.channels, f'{self.name} left!')
-        self.connected = False
+        try:
+            server_channels.channels[self.channel].remove(self)
+            server_messaging.message_client(self.client, "DISCONNECT")
+            self.client.close()
+            print(f"{self.name} left!")
+            server_messaging.broadcast(server_channels.channels, f'{self.name} left!')
+        except:
+            pass
 
 def find_client(name: str):
     for channel in server_channels.channels.values():
@@ -41,17 +40,13 @@ def find_client(name: str):
 
 def handle_client_msgs(client: Client):
     while True:
-        # Check if the client has disconnected
-        if client.connected == False:
-            break
-
         try:
             message = client.client.recv(1024).decode('utf-8')
-            print(f"{client.name}: {message}")
+            print(f"[{client.channel}] {client.name}: {message}")
             if (message.startswith('-')):
                 server_commands.parse_command(message, client)
             else:
-                server_messaging.broadcast_channel(server_channels.channels[client.channel], f"{client.name}: {message}")
+                server_messaging.broadcast_channel(server_channels.channels[client.channel], f"[{client.channel}] {client.name}: {message}")
         except:
             # Client disconnects with keyboardinterrupt or crashes
             client.disconnect()

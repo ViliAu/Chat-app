@@ -44,6 +44,10 @@ def wait_for_clients(server_socket: socket.socket):
             # Handle nickname
             server_messaging.message_client(client, 'NAME')
             nickname = client.recv(1024).decode(server_messaging.ENCODING)
+            if server_client.find_client(nickname) != None:
+                server_messaging.message_client(client, "INVALID_NAME")
+                client.close()
+                continue
             server_messaging.broadcast(f"{nickname} joined!")
 
             # Add client to the main channel

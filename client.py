@@ -50,6 +50,9 @@ def recv(client, nickname):
             message = client.recv(1024).decode(ENCODING)
             if message == 'NAME':
                 client.send(nickname.encode(ENCODING))
+            elif message == 'INVALID_NAME':
+                print('The nickname is already taken.')
+                break
             elif message == 'DISCONNECT':
                 break
             else:
