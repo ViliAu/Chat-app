@@ -52,7 +52,7 @@ def list_users(client, args):
         users = server_channels.get_user_list()
     if len(users) > 0:
         msg = ", ".join(users)
-    server_messaging.message_client(client.client, msg)
+    server_messaging.message_client(client.client, f"Users online: {msg}")
 
     
 def change_channel(client, args):
@@ -64,6 +64,12 @@ def change_channel(client, args):
         return
     server_channels.change_channel(client, args[0])
 
+def broadcast_message(client, args):
+    if (len(args) == 0):
+        server_messaging.message_client(client, "Usage: -broadcast [message]")
+        return
+    server_messaging.broadcast(f"(broadcast) {client.name}: {' '.join(args)}")
+
     
 # Commands
 COMMANDS = {
@@ -71,7 +77,8 @@ COMMANDS = {
     "disconnect": disconnect,
     "pm": private_message,
     "list": list_users,
-    "ch": change_channel
+    "ch": change_channel,
+    "broadcast": broadcast_message
 }
 
 COMMAND_HELP = {
@@ -79,5 +86,6 @@ COMMAND_HELP = {
     "disconnect": "Disconects the client from the server. Usage: -disconnect",
     "pm": "Sends a private message to a user regardless of their channel. Usage: -pm [recipient] [message]",
     "list": "Lists all users if no arguments are passed. Lists users on the passed channel. Usage: -list ([channel])",
-    "ch": "Change to a different channel. Lists available channels if no arguments are given. Usage: -ch ([channel])"
+    "ch": "Change to a different channel. Lists available channels if no arguments are given. Usage: -ch ([channel])",
+    "broadcast": "Broadcast a message across all cahnnels. Usage: -broadcast [message]"
 }
