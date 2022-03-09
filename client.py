@@ -9,22 +9,24 @@ PORT = 6666
 ENCODING = "utf-8"
 
 def setup_client():
-    # Choosing Nickname
-    nickname = input("Choose your nickname: ")
-
     # Connecting To Server
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    host_adr = input("Give an ip-address to join: ")
     try:
-        client.connect((HOST, PORT))
+        client.connect((host_adr, PORT))
+    except:
+        print("Couldn't connect to server. Closing client.")
+        return
+
+    try:
+        # Choosing Nickname
+        nickname = input("Choose your nickname: ")
 
         send_thread = threading.Thread(target=send, args=(client,))
         send_thread.daemon = True
-        #recv_thread = threading.Thread(target=recv, args=(client, nickname,))
 
         send_thread.start()
-        #recv_thread.start()
         recv(client, nickname)
-
     except:
         pass
 

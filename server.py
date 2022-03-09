@@ -1,6 +1,5 @@
 import socket
 import threading
-import traceback
 import util.server_commands as server_commands
 import util.server_messaging as server_messaging
 import util.server_channels as server_channels
@@ -44,7 +43,7 @@ def wait_for_clients(server_socket: socket.socket):
             # Handle nickname
             server_messaging.message_client(client, 'NAME')
             nickname = client.recv(1024).decode(server_messaging.ENCODING)
-            if server_client.find_client(nickname) != None:
+            if server_client.find_client(nickname) != None or ' ' in nickname:
                 server_messaging.message_client(client, "INVALID_NAME")
                 client.close()
                 continue
