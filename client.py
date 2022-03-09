@@ -26,21 +26,16 @@ def setup_client():
         recv(client, nickname)
 
     except:
-        print("Couldn't connect to server!")
+        pass
 
 def send(client):
     while True:
         try:
             message = input('')
             client.send(message.encode(ENCODING))
-        except KeyboardInterrupt:
-            # Close client with keyboard interrupt
-            print("Closing client")
-            client.close()
-            break
         except:
             # Close Connection When Error
-            print("An error occured!")
+            print("Closing client")
             client.close()
             break
 
@@ -57,14 +52,9 @@ def recv(client, nickname):
                 break
             else:
                 print(message)
-        except KeyboardInterrupt:
-            # Close client with keyboard interrupt
-            print("Closing client")
-            client.close()
-            break
         except:
-            # Close Connection When Error
-            print("An error occured!")
+            # Close Connection When Error or keyboardinterrupt
+            print("Closing client.")
             client.close()
             break
 

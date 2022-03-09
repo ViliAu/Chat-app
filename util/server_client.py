@@ -1,4 +1,5 @@
 import threading
+import traceback
 import util.server_messaging as server_messaging
 import util.server_channels as server_channels
 import util.server_commands as server_commands
@@ -24,10 +25,13 @@ class Client:
     def disconnect(self):
         try:
             server_channels.channels[self.channel].remove(self)
-            server_messaging.message_client(self.client, "DISCONNECT")
+            try:
+                server_messaging.message_client(self.client, "DISCONNECT")
+            except:
+                pass
             self.client.close()
             print(f"{self.name} left!")
-            server_messaging.broadcast(server_channels.channels, f'{self.name} left!')
+            server_messaging.broadcast(f'{self.name} left!')
         except:
             pass
 
